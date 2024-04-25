@@ -173,6 +173,5 @@
         </div>
         <!-- vue app -->
         <div id="app"></div>
-        
     </body>
 </html>
