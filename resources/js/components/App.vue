@@ -17,4 +17,8 @@
 
 <script setup>
   const counter = defineModel({ default: 0 });
+
+  window.Echo.channel("test-channel").listen("TestEvent", function (e) {
+      console.log("vue: ", e.message);
+  });
 </script>

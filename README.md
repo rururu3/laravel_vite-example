@@ -60,13 +60,13 @@ createApp(App).mount("#app");
 6. HTMLファイルを更新:
 - welcome.blade.phpファイルでVueを読み込むための設定を行います。
 ```html
-...
+<!-- 略 -->>
 <head>
-  ...
+  <!-- 略 -->>
   @vite(['resources/css/app.css', 'resources/js/app.js']) <!-- Vueを読み込む -->
 </head>
 <body>
-  ...
+  <!-- 略 -->>
   <div id="app"></div> <!-- マウントポイント -->
 </body>
 </html>
@@ -174,4 +174,113 @@ $warning   : #F2C037
 <script setup>
   const counter = defineModel({ default: 0 });
 </script>
+```
+
+# Laravel Reverb
+[reverb](https://laravel.com/docs/11.x/reverb)
+
+[参考](https://reffect.co.jp/laravel/laravel-reverb)
+
+1. Broadcasting機能をインストールする(Laravel Reverbのインストール)
+- コマンドを利用してインストールする
+```bash
+php artisan install:broadcasting
+```
+※途中でLaravel ReverbやNodeモジュールのインストールするかなど聞かれるのでYesで
+
+2. テストのためのイベント作成
+- 動作確認のためテストイベントを作成
+```bash
+php artisan make:event TestEvent
+```
+
+3. イベントクラスを修正
+- ShouldBroadcastインターフェイスを使うのとChannelクラスを使用するように修正する
+```php
+// 略
+class TestEvent implements ShouldBroadcast
+{
+  // 略
+        return [
+            new Channel('test-channel'),
+        ];
+}
+```
+4. イベント実行をする
+- テストのため/にアクセスした際にイベントを発行するようにする
+web.php
+```php
+<?php
+
+use App\Events\TestEvent;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    TestEvent::dispatch();
+    return view('welcome');
+});
+```
+
+5. Reverbサーバー起動
+- 
+```bash
+php artisan reverb:start
+```
+
+6. 確認
+- サーバーを起動して/にアクセスしイベントが発行されてるか確認する
+```bash
+php artisan serve
+```
+※database/database.sqliteのjobsテーブルにデータが追加されてたらOK
+
+7. Queue Workerの起動
+- Job実行のためにQueue Workerを起動する
+```bash
+php artisan queue:work
+```
+
+8. ブラウザ側でのデータ受信準備
+- 発行されたイベントを受け取るために処理を追加する(Viteの設定はしてるものとする)
+bootstrap.js
+```JavaScript
+// 略
+Echo.channel("test-channel").listen("TestEvent", function (e) {
+    console.log("received a message");
+});
+```
+※`npm run dev`でVite開発サーバーを起動しておくこと
+※`php artisan reverb:start --debug`でReverbサーバーをデバッグ有効で起動するとコンソールにログが流れてくる
+
+9. イベント発行時に情報をいれる
+- イベントにメッセージを登録できるようにする
+TestEvent.php
+```php
+// 略
+    public $message;
+
+    /**
+     * Create a new event instance.
+     */
+    public function __construct()
+    {
+        //
+        $this->message = 'Hello World';
+    }
+```
+bootstrap.js
+```JavaScript
+// 略
+    console.log("received a message", e.message);
+```
+※イベント修正したら`php artisan queue:work`でQueue Workerの再起動が必要かも
+
+10. Vueでイベントを受け取れるように
+- vueコンポーネントでイベント登録してデータ取得できるようにする
+App.vue
+```HTML
+<!-- 略 -->
+  window.Echo.channel("test-channel").listen("TestEvent", function (e) {
+      console.log("vue: ", e.message);
+  });
 ```
