@@ -15,7 +15,7 @@
   const items = ref([]);
 
   window.Echo.channel("chat-message-channel").listen("ChatMessageEvent", function (e) {
-    items.value.push({
+    items.value.unshift({
       name: e?.name,
       title: e?.title,
       message: e?.message,
