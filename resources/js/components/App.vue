@@ -1,8 +1,8 @@
 <template>
-  <div>
-    <label for="message">メッセージ</label>
-    <input type="text" id="message" name="message" v-model="sendMessage" />
-    <button id="send" @click="send">送信</button>
+  <div class="q-pa-md q-gutter-sm">
+    <q-input rounded outlined v-model="sendMessage" label="メッセージ" >
+      <q-btn round dense flat icon="send" @click="send" />
+    </q-input>
     <ChatItem v-for="item of items" :chatdata="item"></ChatItem>
   </div>
 </template>
