@@ -10,7 +10,3 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
  */
 
 import './echo';
-
-Echo.channel("test-channel").listen("TestEvent", function (e) {
-    console.log("received a message", e.message);
-});
