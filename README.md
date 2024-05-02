@@ -1,6 +1,6 @@
-# Laravel 10でVue 3を使う方法
+# Laravel 11でVue 3を使う方法
 1. プロジェクトの作成:
-- Laravel 10プロジェクトを作成します。
+- Laravel 11プロジェクトを作成します。
 ```bash
 composer create-project laravel/laravel laravel_vite-example
 ```
